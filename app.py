@@ -60,7 +60,7 @@ class YOLOApp:
                 cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-                if label not in self.detected_objects:
+                if label not in self.detected_objects and conf >= 0.65:
                     width = x2 - x1
                     height = y2 - y1
                     area = width * height
@@ -131,7 +131,7 @@ class YOLOApp:
                         cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-                        if label not in self.detected_objects:
+                        if label not in self.detected_objects and conf >= 0.65:
                             width = x2 - x1
                             height = y2 - y1
                             area = width * height
@@ -174,7 +174,6 @@ class YOLOApp:
         self.label.configure(image=imgtk)
         self.window.after(10, self.update_frame)
 
-    # Ao clicar na tecla "g" vai aparecer uma caixa a questionar se quer gerar um relatório
     def ask_generate_report(self, event=None):
         if not self.detected_objects:
             messagebox.showinfo("Relatório", "Nenhum objeto detetado ainda.")
@@ -184,7 +183,6 @@ class YOLOApp:
         if answer:
             self.generate_report()
 
-    # Gera o relatório com os objetos detetados
     def generate_report(self):
         c = canvas.Canvas("relatorio_objetos.pdf", pagesize=A4)
         width, height = A4
@@ -196,6 +194,9 @@ class YOLOApp:
         c.setFont("Helvetica", 12)
 
         for label, data in self.detected_objects.items():
+            if data['confidence'] < 0.65:
+                continue
+
             if y < 150:
                 c.showPage()
                 y = height - 50
