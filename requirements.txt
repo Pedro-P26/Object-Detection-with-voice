@@ -1,2 +1,7 @@
+ollama
+pyttsx3
 ultralytics
+Pillow
 opencv-python
+reportlab
+
